@@ -1,28 +1,14 @@
 //Class name:   Matrix
 //Authors:      NN(design 75%, implementation 15%)
-//              Sasha Milenkovic(design 25%, implementation 85%)
-//Date:         15.06.2002.
+//              Sasa Milenkovic(design 25%, implementation 85%)
 //Description:  This class performs most of common matrix operations
-//
-//Changes:      11.10.2002. Choleskey's decomposition added
-//
-// 8128402, 8989890 ms, 8982637, 8929549, 9155736, 627071, 9174708, 9195674, 9195446!
-// 8406698, 7942164, 9147768, 8246641, 7930088, 9063498, 9063498, 8909241, 8882657, 9155863
-// 8671116, 9335589, 9176783, 8284305
-//
-// 8490361, 8465071, 8305473,709291, 8742276, 8726472, 8882657
-// 483100, 330697, 334045, 315672, 309501, 308656, 715761
-// 8505881, 622905, 8559210, 8929550, 8553784, 8216692
-// 
 
 #ifndef _lmjjsMatrix
 #define _lmjjsMatrix
 
-//#include <stdio>
 #include <iostream>
 #include <fstream>
 #include <string.h>
-
 
 #define _error 0
 
@@ -31,8 +17,6 @@ using namespace std;
 inline void error(const char* str)
 {
   cout << str << endl;
-  //::MessageBox(NULL, str, "Matrix Operation Error", 0x10010);
-  //MessageDlg(str, mtError, TMsgDlgButtons()<<mbOK, 0);
   exit(_error);
 }
 
@@ -40,7 +24,7 @@ inline void error(const char* str)
 class Matrix{
 public:
   Matrix();
-  Matrix(int m, int n); // matrica dimenzija mxn
+  Matrix(int m, int n);
   Matrix(const Matrix&);
   ~Matrix();
 
@@ -82,22 +66,18 @@ public:
   friend istream& operator>> (istream&, Matrix&);
   friend ostream& operator<< (ostream&, const Matrix&);
 
-//friend Matrix gaussj(double**, int, double**, int);
-  friend Matrix gaussj(const Matrix&); //##sm
-  friend Matrix cholesky(const Matrix&); //##sm
-  friend Matrix lowerL(const Matrix&); //##sm
-  friend Matrix Lyb(const Matrix&, const Matrix&); //##sm
-  friend Matrix Ltxy(const Matrix&, const Matrix&); //##sm
-  friend pair<Matrix, Matrix> ludecomp(const Matrix&); //##sm
-  friend Matrix factor(const Matrix& A); //###sm
-  friend Matrix factor2(const Matrix& A); //###sm
-  friend Matrix solveUC(const Matrix&, const Matrix&); //##sm
-  friend Matrix solveH(const Matrix&, const Matrix&); //##sm
-  friend Matrix solveLU(const Matrix&, const Matrix&); //##sm
-  /*friend void fKolokacija(const Matrix&, const Matrix&,
-                          const Matrix&, const Matrix&,
-                          const Matrix&); //##sm*/
-  Matrix submatrix(int srow, int erow, int scol, int ecol) const;//##sm
+  friend Matrix gaussj(const Matrix&); 
+  friend Matrix cholesky(const Matrix&); 
+  friend Matrix lowerL(const Matrix&); 
+  friend Matrix Lyb(const Matrix&, const Matrix&); 
+  friend Matrix Ltxy(const Matrix&, const Matrix&); 
+  friend pair<Matrix, Matrix> ludecomp(const Matrix&); 
+  friend Matrix factor(const Matrix& A); 
+  friend Matrix factor2(const Matrix& A); 
+  friend Matrix solveUC(const Matrix&, const Matrix&); 
+  friend Matrix solveH(const Matrix&, const Matrix&); 
+  friend Matrix solveLU(const Matrix&, const Matrix&); 
+  Matrix submatrix(int srow, int erow, int scol, int ecol) const;
 
 protected:
   void allocate();
