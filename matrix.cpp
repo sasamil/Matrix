@@ -1,6 +1,10 @@
+//Class name:   Matrix
+//Authors:      NN(design 75%, implementation 15%)
+//              Sasa Milenkovic(design 25%, implementation 85%)
+//Description:  This class performs most of common matrix operations
+
 #include <stdlib.h>
 #include <math.h>
-//#include <string.h> //mozda zbog memset
 
 #include "matrix.h"
 
@@ -11,18 +15,7 @@ inline void swap(double& a, double& b)
   a=b;
   b=temp;
 }
-/*
-//---------------------------------------------------------------------------
-inline const int Matrix::getRows() const
-{
-  return rows;
-}
-//---------------------------------------------------------------------------
-inline const int Matrix::getCols() const
-{
-  return cols;
-}
-*/
+
 //---------------------------------------------------------------------------
 void Matrix::allocate()
 {
@@ -31,7 +24,7 @@ void Matrix::allocate()
   {
     mat[i] = new double[cols];
     for(int j=0; j<cols; j++)
-      mat[i][j] = 0.0;//double(0);
+      mat[i][j] = 0.0;
   }
 }
 //---------------------------------------------------------------------------
@@ -81,9 +74,6 @@ Matrix& Matrix::operator= (const Matrix& right)
   if(&right == this)
     return *this;
 
-  //if(right.cols != cols || right.rows != rows)
-  //error();
-
   release();
   rows=right.rows;
   cols=right.cols;
@@ -91,39 +81,7 @@ Matrix& Matrix::operator= (const Matrix& right)
   copy(right);
   return *this;
 }
-/*
 //---------------------------------------------------------------------------
-//vraca clanove matrice ali indeks pocinje od 1 (ne od 0)
-//A(1,1) je u stvari A[0][0]
-inline const double& Matrix::operator() (int i, int j) const
-{
-  if(i<1 || i>rows || j<1 || j>cols)
-  {
-    cout << i << "  " << j << endl;
-    error("Matrix::operator()\nNeodgovarajuci argumenti!");
-  }
-
-  return mat[i-1][j-1];
-}
-
-//---------------------------------------------------------------------------
-//vraca clanove matrice ali indeks pocinje od 1 (ne od 0)
-//A(1,1) je u stvari A[0][0]
-inline double& Matrix::operator() (int i, int j)
-{
-  if(i<1 || i>rows || j<1 || j>cols)
-  {
-    cout << i << "  " << j << endl;
-    error("Matrix::operator()\nNeodgovarajuci argumenti!");
-  }
-  return mat[i-1][j-1];
-}
-*/
-//---------------------------------------------------------------------------
-//vraca submatricu
-//srow - startrow
-//erow - endrow
-//...itd, itd...
 Matrix Matrix::submatrix(int srow, int erow, int scol, int ecol) const
 {
 
@@ -145,7 +103,6 @@ Matrix Matrix::submatrix(int srow, int erow, int scol, int ecol) const
 int operator== (const Matrix& left, const Matrix& right)
 {
   if(right.cols != left.cols || right.rows != left.rows)
-    //error("operator ==\nBroj redova/kolona nije isti!");
     return 0;
 
   for(int i=0; i<left.rows; i++)
@@ -203,8 +160,7 @@ Matrix& Matrix::operator-= (const Matrix& right)
   {
     for(int j=0; j<cols; j++)
     {
-
-			mat[i][j] -= right.mat[i][j];
+    	mat[i][j] -= right.mat[i][j];
     }
   }
   return *this;
@@ -258,32 +214,22 @@ Matrix& Matrix::operator*= (const Matrix& right)
   return *this = *this*right;
 }
 //---------------------------------------------------------------------------
-//cita matricu iz inputstream-a
 istream& operator>> (istream& is, Matrix& m)
 {
   for(int i=0; i<m.rows; i++)
   {
     for(int j=0; j<m.cols; j++)
     {
-//fajl manji od matrice
       if(is.eof())
         error("Matrix:: istream >> \n Ulazni podaci ne odgovaraju velicini matrice.");
       is >> m.mat[i][j];
     }
   }
-/* UKINUTO!!
-//matrica manja od fajla
-  double d;
-  is >> d;
-  if(!is.eof())
-    error("Matrix:: istream >> \n Ulazni podaci ne odgovaraju velicini matrice.");
-*/
-//go again to the start of file
+
   is.seekg(0, ios::beg);
   return is;
 }
 //---------------------------------------------------------------------------
-//upisuje matricu u outputstream
 ostream& operator<< (ostream& os, const Matrix& m)
 {
   os << "{\n";
@@ -301,7 +247,6 @@ ostream& operator<< (ostream& os, const Matrix& m)
   return os;
 }
 //---------------------------------------------------------------------------
-//pravi jedinacnu matricu reda n
 Matrix E(int n)
 {
   Matrix m(n, n);
@@ -327,7 +272,6 @@ double innerproduct(const Matrix& left, const Matrix& right)
   return d;
 }
 //---------------------------------------------------------------------------
-//trag matrice
 double trag(const Matrix& m)
 {
   if(m.cols != m.rows)
@@ -341,7 +285,6 @@ double trag(const Matrix& m)
   return tr;
 }
 //---------------------------------------------------------------------------
-//transpozicija
 Matrix trans(const Matrix& m)
 {
   Matrix mtemp(m.cols, m.rows);
@@ -354,9 +297,9 @@ Matrix trans(const Matrix& m)
   }
   return mtemp;
 }
+
 //---------------------------------------------------------------------------
-//komplement
-//izbacuje red - r, kolonu - c
+//complement
 Matrix comp(const Matrix& m, int r, int c)
 {
   if(m.cols<1 || m.rows<1)
@@ -374,10 +317,11 @@ Matrix comp(const Matrix& m, int r, int c)
     }
     x++;
   }
+  
   return mtemp;
 }
 //---------------------------------------------------------------------------
-//determinanta
+//determinant
 double det(const Matrix& m)
 {
   if(m.cols != m.rows)
@@ -392,7 +336,7 @@ double det(const Matrix& m)
   return temp;
 }
 //---------------------------------------------------------------------------
-//kofaktor (r,c) clana matrice m
+// cofactor
 double cofact(const Matrix& m, int r, int c)
 {
   if(m.cols != m.rows)
@@ -408,7 +352,7 @@ double cofact(const Matrix& m, int r, int c)
   }
 }
 //---------------------------------------------------------------------------
-//adjungovana matrica
+// adjunct matrix
 Matrix adj(const Matrix& m)
 {
   if(m.cols != m.rows)
@@ -424,16 +368,7 @@ Matrix adj(const Matrix& m)
   }
   return trans(mtemp);
 }
-//---------------------------------------------------------------------------
-//UKINUTO !!
-//inverzna matrica preko adjungovane matrice
-//Matrix inv(const Matrix& m)
-//{
-//	if(m.cols != m.rows) error();
-//	double temp = det(m);
-//	if(temp == 0.0) error();
-//	return (1.0/temp)*adj(m);
-//}
+
 //---------------------------------------------------------------------------
 Matrix inv(const Matrix& m)
 {
@@ -445,8 +380,7 @@ Matrix invh(const Matrix& m)
   return cholesky(m);
 }
 //---------------------------------------------------------------------------
-//Gauss-Jordan-ova Eliminacija
-//(sa pivotizacijom)
+//Gauss-Jordan
 Matrix gaussj(const Matrix& aa)
 {
   int i, icol, irow, j, k, l, ll;
@@ -512,15 +446,15 @@ Matrix gaussj(const Matrix& aa)
         inv.mat[ll][icol]=0.0;
         for(l=0; l<n; ++l)
           inv.mat[ll][l] -= inv.mat[icol][l]*dum;
-      }//ll loop
-  }//i loop
+      }
+  }
 
   for(l=n-1; l>=0; --l)
   {
     if(indexr[l] != indexc[l])
       for(k=0; k<n; ++k)
         swap(inv.mat[k][indexr[l]], inv.mat[k][indexc[l]]);
-  }//l loop
+  }
 
   delete[] ipiv;
   delete[] indexc;
@@ -529,15 +463,12 @@ Matrix gaussj(const Matrix& aa)
   return inv;
 }
 //---------------------------------------------------------------------------
-//Cholesky-jeva dekompozicija
-//aa mora biti simetricna i pozitivno definitna
+//Cholesky
+//aa symetric and positive definite
 Matrix lowerL(const Matrix& aa)
 {
  if (aa.rows != aa.cols)
     error("F-ja lowerL()\nNije kvadratna matrica!");
-
- //double MINVAL = 0.00001;
- //double MINVALKV = MINVAL*MINVAL;
 
  int i, j, k;
  int n=aa.rows;
@@ -552,19 +483,18 @@ Matrix lowerL(const Matrix& aa)
 
      if(j==k)
        l(j,j) = sqrt(aa(j,j)-sum);
-     //if(j==k)
-       //l.mat[j][j] = aa.mat[j][j]>sum+MINVALKV ? sqrt(aa.mat[j][j]-sum): MINVAL;
      else
        l(k,j) = (aa(j,k)-sum)/l(j,j);
-   } //k loop
- }//j loop
+   } 
+ }
 
 
  return l;
 }
+
 //---------------------------------------------------------------------------
-//resavanje linearne jednacine - L*y=b
-//L(n,n) je leva dijagonalna matrica; y(n) i b(n) su vektori
+// L*y=b
+// L(n,n) left diagonal
 Matrix Lyb(const Matrix& L, const Matrix& b)
 {
  if (L.rows != L.cols)
@@ -576,7 +506,7 @@ Matrix Lyb(const Matrix& L, const Matrix& b)
 
  int n=L.rows;
  double sum;
- Matrix y(n, 1); //resenje jednacine
+ Matrix y(n, 1); 
 
  for(int k=0; k<n; k++)
  {
@@ -591,8 +521,8 @@ Matrix Lyb(const Matrix& L, const Matrix& b)
 
 }
 //---------------------------------------------------------------------------
-//Resavanje linearne jednacine - L*x=y
-//L(n,n) je gornja dijagonalna matrica; x(n) i y(n) su vektori
+// L*x=y
+// L(n,n) upper diagonal
 Matrix Ltxy(const Matrix& L, const Matrix& y)
 {
  if (L.rows != L.cols)
@@ -604,7 +534,7 @@ Matrix Ltxy(const Matrix& L, const Matrix& y)
 
  int n=L.rows;
  double sum;
- Matrix x(n, 1); //resenje jednacine
+ Matrix x(n, 1); 
 
  for(int k=n-1; k>=0; k--)
  {
@@ -619,8 +549,6 @@ Matrix Ltxy(const Matrix& L, const Matrix& y)
 }
 
 //---------------------------------------------------------------------------
-//procedura za racunanje LU dekompozicije kvadratne matrice
-//(za sada bez pivotiranja)
 pair<Matrix, Matrix> ludecomp(const Matrix& A)
 {
  if (A.rows != A.cols)
@@ -629,15 +557,13 @@ pair<Matrix, Matrix> ludecomp(const Matrix& A)
  int k;
  int n=A.rows;
  double sum;
- Matrix L = E(n);  //L(i,i)=1.0;
+ Matrix L = E(n);  
  Matrix U(n, n);
 
- double eps=0.0000000001; // kriterijum za nepotpun rang - eps=10^(-10)
+ double eps=1e-12; 
 
- //idemo po dijagonali i racunamo red desno i kolonu ispod
  for(int it=1; it<=n; it++)
  {
-   //izracunaj red "it"; sve elemente U(it,j), (j=it,...,n)
    for(int j=it; j<=n; j++)
    {
      for(sum=0.0, k=1; k<it; k++)   sum += L(it,k)*U(k,j);
@@ -649,7 +575,6 @@ pair<Matrix, Matrix> ludecomp(const Matrix& A)
      }
    }
 
-   //izracunaj kolonu "it"; sve elemente L(i,it), (i=it+1,...,n)
    for(int i=it+1; i<=n; i++)
    {
      for(sum=0.0, k=1; k<it; k++)   sum += L(i,k)*U(k,it);
@@ -661,8 +586,6 @@ pair<Matrix, Matrix> ludecomp(const Matrix& A)
 }
 
 //---------------------------------------------------------------------------
-//brza UCt dekompozicija simetricne kvadratne matrice (Doolitle)
-//(za sada bez pivotiranja)
 Matrix factor(const Matrix& A)
 {
  if (A.rows != A.cols)
@@ -671,20 +594,17 @@ Matrix factor(const Matrix& A)
  int i, j, k;
  int n=A.rows;
  double sum, sum2;
- double* p = new double[n]; // p - proizvod l(ij)*d(j) ; da bi se izbeglo visestruko izracunavanje
+ double* p = new double[n];
  Matrix L(n,n);
 
  for(i=1; i<=n; i++)
  {
-   //racunanje cesto koriscenih proizvoda - p
    for(j=1, memset(p,0,(i-1)*sizeof(double)); j<i; j++)
    {
-     for(k=1, sum=0.0; k<j; k++)   /*p[j] -=*/ sum += p[k]*L(j,k);
+     for(k=1, sum=0.0; k<j; k++)   sum += p[k]*L(j,k);
      p[j] = A(i,j) - sum;
-     //p[j] += A(i,j);
    }
 
-   //uz pomoc izracunatog "p" racunamo poddijagonalne clanove (L(i,j),j<i) u i-tom redu...
    for(j=1; j<i; j++)
    {
      L(i,j) = (p[j]-A(i,j))/L(j,j);
@@ -696,7 +616,6 @@ Matrix factor(const Matrix& A)
      sum2 += p[j] * L(i,j);
    }
 
-   //... a zatim i dijagonalni clan L(i,i) = d(i)
    L(i,i) = A(i,i) - sum2;
  }
 
@@ -705,8 +624,6 @@ Matrix factor(const Matrix& A)
 }
 
 //---------------------------------------------------------------------------
-//brza UCt dekompozicija simetricne kvadratne matrice (Doolitle)
-//(za sada bez pivotiranja)
 Matrix factor2(const Matrix& A)
 {
  if (A.rows != A.cols)
@@ -715,28 +632,21 @@ Matrix factor2(const Matrix& A)
  int i, j, k;
  int n=A.rows;
  double sum, sum2;
- double* p = new double[n]; // p - proizvod l(ij)*d(j) ; da bi se izbeglo visestruko izracunavanje
+ double* p = new double[n]; 
  Matrix L(n,n);
 
  for(i=1; i<=n; i++)
  {
-   //racunanje cesto koriscenih proizvoda - p
    for(j=1, sum2=0.0, memset(p,0,(i-1)*sizeof(double)); j<i; j++)
    {
      for(k=1, sum=0.0; k<j; k++)  sum += p[k]*L(j,k);
 
      p[j] = A(i,j) - sum;
-     //cout << "p(" << i << "," << j << ")=" << p[j] << endl;
-
-    //uz pomoc izracunatog "p" racunamo poddijagonalne clanove (L(i,j),j<i) u i-tom redu...
-     L(i,j) = (p[j]/*-A(i,j)*/) / L(j,j);
-     //cout << "L(" << i << "," << j << ")=" << L(i,j) << endl;
+     L(i,j) = p[j] / L(j,j;
      sum2 += p[j] * L(i,j);
    }
 
-   //... a zatim i dijagonalni clan L(i,i) = d(i)
    L(i,i) = A(i,i) - sum2;
-   //cout << " L(" << i << "," << i << ")=" << L(i,i) << endl << endl;
  }
 
  delete[] p;
@@ -744,9 +654,6 @@ Matrix factor2(const Matrix& A)
 }
 
 //---------------------------------------------------------------------------
-//procedura za resavanje sistema jednacina
-//preko brze uopstene holeskijeve dekompozicije (UC)
-//(A mora da bude simetricna matrica)
 Matrix solveUC(const Matrix& A, const Matrix& y)
 {
  if (A.rows != A.cols)
@@ -760,35 +667,26 @@ Matrix solveUC(const Matrix& A, const Matrix& y)
  int n=A.rows;
  double sum;
 
- //uopstena holeskijeva dekompozicija
- //u pair<Matrix, Matrix> p = factor(A);
  Matrix p = factor(A);
 
- Matrix y2(n, 1); //promenjeni vektor y - resenje sistema L*y2 = y
+ Matrix y2(n, 1); 
  for(i=1; i<=n; i++)
  {
-   for(k=1, sum=0.0; k<i; k++)   sum += p(i,k)*y2(k,1); //Dk * Lik * Yk
+   for(k=1, sum=0.0; k<i; k++)   sum += p(i,k)*y2(k,1); 
    y2(i,1) = (y(i,1) - sum);
  }
 
- Matrix x(n, 1); //vektor x - resenje sistema D*trans(L)*x = y2 (x se upisuje u y2)
+ Matrix x(n, 1); 
  for(i=n; i>=1; i--)
  {
-   for(k=n, sum=0.0; k>i; k--)   sum += p(k,i)*x(k,1); //Lki * Xk
+   for(k=n, sum=0.0; k>i; k--)   sum += p(k,i)*x(k,1); 
    x(i,1) = y2(i,1)/p(i,i) - sum;
-   //(y2(i,1) /= p(i,i)) -= sum; //moze i ovo
-   /*
-   y2(i,1) /= p(i,i);
-   y2(i,1) -= sum;*/
  }
 
  return x;
 }
 
 //---------------------------------------------------------------------------
-//procedura za resavanje sistema jednacina
-//preko stroge holeskijeve dekompozicije
-//(A mora da bude simetricna i pozitivno definitna matrica)
 Matrix solveH(const Matrix& A, const Matrix& y)
 {
  if (A.rows != A.cols)
@@ -798,16 +696,13 @@ Matrix solveH(const Matrix& A, const Matrix& y)
  if (y.cols != 1)
     error("F-ja solve()\ny nije vektor!");
 
- Matrix L = lowerL(A);  //stroga Holeskijeva dekompozicija
- Matrix y2 = Lyb(L,y); //promenjeni vektor y - resenje sistema L*y2 = y
+ Matrix L = lowerL(A);  
+ Matrix y2 = Lyb(L,y); 
 
- return Ltxy(trans(L),y2); //return - resenje sistema trans(L)*x = y2
+ return Ltxy(trans(L),y2); 
 }
 
 //---------------------------------------------------------------------------
-//procedura za resavanje sistema jednacina
-//preko LU holeskijeve dekompozicije
-//(A je PROIZVOLJNA matrica)
 Matrix solveLU(const Matrix& A, const Matrix& y)
 {
  if (A.rows != A.cols)
@@ -817,15 +712,13 @@ Matrix solveLU(const Matrix& A, const Matrix& y)
  if (y.cols != 1)
     error("F-ja solve()\ny nije vektor!");
 
- pair<Matrix, Matrix> p = ludecomp(A);  //LU dekompozicija
- Matrix y2 = Lyb(p.first,y); //promenjeni vektor y - resenje sistema L*y2 = y
+ pair<Matrix, Matrix> p = ludecomp(A);  
+ Matrix y2 = Lyb(p.first,y); 
 
- return Ltxy(p.second,y2); //return - resenje sistema trans(L)*x = y2
+ return Ltxy(p.second,y2); 
 }
 
 //---------------------------------------------------------------------------
-//procedura za racunanje inverzije matrice
-//preko holeskijeve dekompozicije
 Matrix cholesky(const Matrix& aa)
 {
   if (aa.rows != aa.cols)
@@ -835,11 +728,10 @@ Matrix cholesky(const Matrix& aa)
   Matrix inv(n,n);
 
   Matrix L=lowerL(aa);
-  Matrix C(n,n); //C<=>trans(L)*inv(aa)
+  Matrix C(n,n); 
   Matrix E1=E(n);
 
   Matrix b(n,1), y(n,1), x(n,1);
-//resavanje sistema L*C=E
   for(int i=1; i<=n; i++)
   {
     b=E1.submatrix(1,n,i,i);
@@ -848,7 +740,6 @@ Matrix cholesky(const Matrix& aa)
       C.mat[j][i-1]=y.mat[j][0];
   }
 
-//resavanje sistema trans(L)*inv(aa)=C
   for(int i=1; i<=n; i++)
   {
     b=C.submatrix(1,n,i,i);
