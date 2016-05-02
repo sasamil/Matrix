@@ -758,43 +758,35 @@ class SparseMatrix
  }
 
 //---------------------------------------------------------------------------
-  //brza UCt dekompozicija simetricne kvadratne matrice (Doolitle)
-  //(za sada bez pivotiranja)
-  //UMESTO LISTE - UPOTREBA sdt::map<unsigned, T>
-  //ali se map upotrebljava kao list, razlika je samu u brzini iteriranja
   friend SparseMatrix<T> factor7(const SparseMatrix<T>& A)
   {
    //f if (A.rows != A.cols)
       //f error("F-ja factor()\nA nije kvadratna matrica!");
 
    unsigned int i=0, j;
-   unsigned int j2; //for double traversing
+   unsigned int j2; 
    typename SparseMatrix<T>::rows_const_iterator it;
    typename SparseMatrix<T>::onerow_const_iterator itr;
    typename SparseMatrix<T>::onecol_const_iterator itc;
-   map<unsigned int, T> mp;   //f
+   map<unsigned int, T> mp;  
    typename map<unsigned int, T>::iterator mit0, mit;
 
    unsigned int n=A.rows();
    T lj;
-   T* d = new T[n]; // d - dijagonalni clan d(j,j) ; da bi se izbeglo visestruko pretrazivanje
+   T* d = new T[n]; 
 
    SparseMatrix<T> L(n,n);
-   //Matrix L(n,n);
 
-   //svi dijagonalni elementi za pocetak nula
    memset(d,0,n*sizeof(T));
-   //iteriranje iz reda u red
    it=A.rows_.begin();
    while( it!=A.rows_.end() )
    {
-     if( !it->empty() )   //f neki text
+     if( !it->empty() )   
      {
-       //racunanje cesto koriscenih proizvoda - p
        itr=it->begin();
-       j = j2 = itr->first; //j2 - sledeci A tj. A(i,j2)
+       j = j2 = itr->first; 
        mp.clear();
-       mit0 = mp.insert(make_pair(n, A.nullVal)).first; //trick!!
+       mit0 = mp.insert(make_pair(n, A.nullVal)).first; 
        while(j<i)
        {
          if(j==j2)
@@ -802,9 +794,9 @@ class SparseMatrix
            if( j != mit0->first )
              mit0 = mp.insert(mit0, make_pair(j, itr->second));
            else
-             mit0->second += itr->second;  //p[j] = itr->second;
+             mit0->second += itr->second; 
 
-           if(++itr != it->end())//mora provera; pravi probleme ako je a(k>=i)=0
+           if(++itr != it->end())
              j2 = itr->first;
            else
              j2=i;
@@ -816,38 +808,33 @@ class SparseMatrix
          {
            while(itc->first > (++mit)->first);
 
-           if(n == mit->first) //dosli smo do kraja i sada samo dodajemo na kraj
+           if(n == mit->first) 
            {
              mp.insert(make_pair(itc->first, -mit0->second*itc->second));
              while(++itc!=L.cols_[j].end())
                mp.insert(make_pair(itc->first, -mit0->second*itc->second));
 
-             break; //exit outer "while(++itc!=L.cols_[j].end())" loop
+             break; 
            }
 
-           //umecemo novi ako je < a ako je == onda ne; nego samo
-	   //korigujemo staru vrednost i idemo u sledecu iteraciju
 	   else if(itc->first < mit->first)
              mit = mp.insert(mit, make_pair(itc->first, -mit0->second*itc->second));
            else
              mit->second -= mit0->second * itc->second;
-         }//while(++itc != L.cols_[j].end()) i.e. for all subdiagonal items in column j
+         }
 
          lj = mit0->second/d[j];
          L.push_fast(i+1, j+1, lj);
          d[i] -= mit0->second * lj;
 
-         //find out the next item in list
-         if( (++mit0)->first <= j2 ) //next item in list for next iteration is fill-in
+         if( (++mit0)->first <= j2 ) 
            j = mit0->first;
-         else //next item is A(i,j2) OR we have just reached the diagonal
+         else 
            j = j2;
-       }//while j<i i.e for all elements in row before the diagonal element
+       }
 
-       //... a zatim racunamo i dijagonalni clan L(i,i) = d(i)
        if( itr->first == i )
          d[i] += itr->second;
-         //d[i] += a[i];//A(i,i);
 
        if(d[i]==0.0)
        {
@@ -858,10 +845,10 @@ class SparseMatrix
        }
 
        L.push_fast(i+1, i+1, d[i]);
-     }//if not empty
+     }
 
      ++it; ++i;
-   }//while iterating every row
+   }
 
    delete[] d;
 
@@ -869,10 +856,6 @@ class SparseMatrix
  }
 
 //---------------------------------------------------------------------------
-  //brza UCt dekompozicija simetricne kvadratne matrice (Doolitle)
-  //(za sada bez pivotiranja)
-  //UMESTO LISTE - UPOTREBA sdt::map<unsigned, T>
-  //ali se map upotrebljava standardno kao map
   friend SparseMatrix<T> factor8(const SparseMatrix<T>& A)
   {
    //f if (A.rows != A.cols)
@@ -883,78 +866,46 @@ class SparseMatrix
    typename SparseMatrix<T>::onerow_const_iterator itr;
    typename SparseMatrix<T>::onecol_const_iterator itc;
    map<unsigned int, T> mp;   //f
-   typename map<unsigned int, T>::iterator mit; //, mit2; //1. varijanta
+   typename map<unsigned int, T>::iterator mit; 
 
    unsigned int n=A.rows();
    T lj;
-   T* d = new T[n]; // d - dijagonalni clan d(j,j) ; da bi se izbeglo visestruko pretrazivanje
-   //pair<typename map<unsigned int, T>::iterator, bool> pr; // 2. varijanta
+   T* d = new T[n]; 
 
    SparseMatrix<T> L(n,n);
-   //Matrix L(n,n);
 
-   //svi dijagonalni elementi za pocetak nula
    memset(d,0,n*sizeof(T));
-   //iteriranje iz reda u red
    it=A.rows_.begin();
    while( it!=A.rows_.end() )
    {
-     if( !it->empty() )   //f neki text
+     if( !it->empty() )  
      {
-       //racunanje cesto koriscenih proizvoda - p
        mp.clear();
        itr=it->begin();
        while(itr!=it->end() && itr->first<i)
        {
-         mp.insert(make_pair(itr->first, itr->second)); //ubaci osnovne elemente
+         mp.insert(make_pair(itr->first, itr->second));
          ++itr;
        }
 
-       //ubaci fill-ins-ove
        mit=mp.begin();
-       //while(j<i)
        while(mit!=mp.end())
-       //while(mit->first < i)
        {
          itc = L.cols_[mit->first].begin();
          while(++itc != L.cols_[mit->first].end())
-         {  /*  1. varijanta
-           mit2 = mp.find(itc->first);
-
-           //korigujemo staru vrednost i idemo u sledecu iteraciju
-           if(mit2 != mp.end())
-             mit2->second -= mit->second * itc->second;
-
-           //umecemo novi ako je nije pronadjen odgovarajuci key
-           else
-             mp.insert(make_pair(itc->first, -mit->second*itc->second));
-           */
-
-           /*  2. varijanta
-           pr = mp.insert(make_pair(itc->first, -mit->second*itc->second));
-           if(!pr.second)
-             pr.first->second -= mit->second * itc->second;
-           */
-
-           // 3. varijanta
+         {  
            mp[itc->first] -= mit->second * itc->second;
+         }
 
-           //++itc;
-         }//while(itc != L.cols_[mit->first].end()) i.e. for all subdiagonal items in column j
-
-         //racunamo l[j], d[i] i inkrementiramo mit za sledecu operaciju
          lj = mit->second/d[mit->first];
          L.push_fast(i+1, mit->first+1, lj);
          d[i] -= mit->second * lj;
-         //u cout << i << "," << mit->first/*j*/ << "," << lj << endl; //u
 
          ++mit;
-       }//while j<i i.e for all elements in row before the diagonal element
+       }
 
-       //... a zatim racunamo i dijagonalni clan L(i,i) = d(i)
        if( itr->first == i )
          d[i] += itr->second;
-         //d[i] += a[i];//A(i,i);
 
        if(d[i]==0.0)
        {
@@ -965,10 +916,10 @@ class SparseMatrix
        }
 
        L.push_fast(i+1, i+1, d[i]);
-     }//if not empty
+     }
 
      ++it; ++i;
-   }//while iterating every row
+   }
 
    delete[] d;
 
@@ -976,10 +927,6 @@ class SparseMatrix
  }
 
 //---------------------------------------------------------------------------
-  //brza UCt dekompozicija simetricne kvadratne matrice (Doolitle)
-  //(za sada bez pivotiranja)
-  //SLICNO KAO factor6;
-  //RAZIKA: prvo idu copy elementi p tek naknadno fillins-ovi
   friend SparseMatrix<T> factor9(const SparseMatrix<T>& A)
   {
    //f if (A.rows != A.cols)
@@ -989,39 +936,35 @@ class SparseMatrix
    typename SparseMatrix<T>::rows_const_iterator it;
    typename SparseMatrix<T>::onerow_const_iterator itr;
    typename SparseMatrix<T>::onecol_const_iterator itc;
-   list<pair<unsigned int, T> > lt;   //f
+   list<pair<unsigned int, T> > lt;  
    typename list<pair<unsigned int, T> >::iterator lit0, lit;
 
    unsigned int n=A.rows();
    T lj;
-   T* d = new T[n]; // d - dijagonalni clan d(j,j) ; da bi se izbeglo visestruko pretrazivanje
+   T* d = new T[n]; 
 
    SparseMatrix<T> L(n,n);
-   //Matrix L(n,n);
 
-   //svi dijagonalni elementi za pocetak nula
    memset(d,0,n*sizeof(T));
-   //iteriranje iz reda u red
    it=A.rows_.begin();
    while( it!=A.rows_.end() )
    {
-     if( !it->empty() )   //f neki text
+     if( !it->empty() )   
      {
-       //racunanje cesto koriscenih proizvoda - p
        lt.clear();
        itr=it->begin();
        while(itr!=it->end() && itr->first<i)
        {
-         lt.push_back(make_pair(itr->first, itr->second)); //ubaci osnovne elemente
+         lt.push_back(make_pair(itr->first, itr->second)); 
          ++itr;
        }
 
-       lt.push_back(make_pair(n, T())); //Trick !!!
+       lt.push_back(make_pair(n, T()));
        lit0 = lt.begin();
        while( lit0->first < i )
        {
-         int j = lit0->first;   //u
-         T pj = lit0->second;      //u
+         int j = lit0->first;   
+         T pj = lit0->second;    
 
          lit = lit0;
          itc = L.cols_[lit0->first].begin();
@@ -1029,34 +972,30 @@ class SparseMatrix
          {
            while(itc->first > (++lit)->first);
 
-           if(n == lit->first) //dosli smo do kraja i sada samo dodajemo na kraj
+           if(n == lit->first) 
            {
              lit=lt.insert(lit, make_pair(itc->first, -lit0->second*itc->second));
              while(++itc!=L.cols_[j].end())
                lit=lt.insert(++lit, make_pair(itc->first, -lit0->second*itc->second));
 
-             break; //exit outer "while(++itc!=L.cols_[j].end())" loop
+             break; 
            }
 
-           //umecemo novi ako je < a ako je == onda ne; nego samo
-	   //korigujemo staru vrednost i idemo u sledecu iteraciju
 	   else if(itc->first < lit->first)
              lit = lt.insert(lit, make_pair(itc->first, -lit0->second*itc->second));
            else
              lit->second -= lit0->second * itc->second;
-         }//while(++itc != L.cols_[j].end()) i.e. for all subdiagonal items in column j
+         }
 
          lj = lit0->second/d[lit0->first];
          L.push_fast(i+1, lit0->first+1, lj);
          d[i] -= lit0->second * lj;
 
          ++lit0;
-       }//while j<i i.e for all elements in row before the diagonal element
+       }
 
-       //... a zatim i dijagonalni clan L(i,i) = d(i)
        if( itr->first == i )
          d[i] += itr->second;
-         //d[i] += a[i];//A(i,i);
 
        if(d[i]==0.0)
        {
@@ -1067,10 +1006,10 @@ class SparseMatrix
        }
 
        L.push_fast(i+1, i+1, d[i]);
-     }//if not empty
+     }
 
      ++it; ++i;
-   }//while iterating every row
+   }
 
    delete[] d;
 
