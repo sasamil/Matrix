@@ -1017,15 +1017,10 @@ class SparseMatrix
  }
 
 //---------------------------------------------------------------------------
-  //brza Holeskijeva dekompozicija simetricne pozitivno definitne
-  //kvadratne matrice (za sada bez pivotiranja)
-  friend SparseMatrix<T> ltl(/*const //f */SparseMatrix<T>& A)
+  friend SparseMatrix<T> ltl(SparseMatrix<T>& A)
   {
    //if (A.rows() != A.rows())
       //error("F-ja lowerL()\nNije kvadratna matrica!");
-
-   //double MINVAL = 0.00001;
-   //double MINVALKV = MINVAL*MINVAL;
 
    unsigned int i, j, k;
    typename SparseMatrix<T>::rows_const_iterator it;
@@ -1033,47 +1028,41 @@ class SparseMatrix
    typename SparseMatrix<T>::onecol_const_iterator itr2;
 
    unsigned int n=A.rows();
-   T* sum = new T[n]; // l - poddijagonalni clanovi (L(i,j),j<i) u i-tom redu...
-   T* a = new T[n]; // a - poddijagonalni clanovi (A(i,j),j<=i) u i-tom redu...
+   T* sum = new T[n]; 
+   T* a = new T[n]; 
    T dd;
-   SparseMatrix<T> L(n, n); //left lower matrix of aa
+   SparseMatrix<T> L(n, n); 
 
-   for(it=A.rows_.begin(), j=1, memset(sum,0,n*sizeof(T));//f n
+   for(it=A.rows_.begin(), j=1, memset(sum,0,n*sizeof(T));
        it!=A.rows_.end(); ++it, ++j, memset(sum, 0, n*sizeof(T)))
    {
-     //izvlacenje i-tog reda matrice A
-     for(itr1=it->begin(), memset(a,0,n*sizeof(T)); //n
+     for(itr1=it->begin(), memset(a,0,n*sizeof(T)); 
          itr1!=it->end(); ++itr1)
        a[itr1->first] = itr1->second;
 
-     //racunanje privreminih suma
      for(itr1=L.rows_[j-1].begin(), i=itr1->first;
          itr1!=L.rows_[j-1].end(); ++itr1, i=itr1->first)
      {
        for(itr2=L.cols_[i].find(j-1); itr2!=L.cols_[i].end(); ++itr2)
          sum[itr2->first] += itr1->second * itr2->second;
-     }//for every left-row member - iterate corresponding right row
+     }
 
      for(k=j; k<=n; k++)
      {
        if(j==k)
        {
-         dd = sqrt(a[j-1]/*A(j,j)*/-sum[k-1]);
+         dd = sqrt(a[j-1]-sum[k-1]);
          L.push_fast( j,j, dd );
        }
-       //if(j==k)
-         //l.mat[j][j] = aa.mat[j][j]>sum+MINVALKV ? sqrt(aa.mat[j][j]-sum): MINVAL;
        else
-         L.push_fast( k,j, (a[k-1]/*A(j,k)*/-sum[k-1])/dd/*L(j,j)*/ );
-     } //k loop
-   }//j loop
+         L.push_fast( k,j, (a[k-1]-sum[k-1])/dd );
+     } 
+   }
 
- //delete[] sum;
  return L;
  }
 
 //---------------------------------------------------------------------------
-  //friend istream& operator>> (istream&, SparseMatrix&);
   friend ostream& operator<< (ostream& os, const SparseMatrix<T>& sm)
   {
     if(sm.rows_.empty())
@@ -1087,7 +1076,6 @@ class SparseMatrix
       os << '{';
       for(unsigned int j=1; j<=sm.cols(); ++j)
       {
-        //if( sm(i,j) >= sm.nullVal )  os << " ";
         os << sm(i,j);
         os << ( j<sm.cols() ? "    " : "}" ) ;
       }
@@ -1102,7 +1090,6 @@ class SparseMatrix
 //---------------------------------------------------------------------------
 private:
   T nullVal;
-  //const T nullValC;
   vector<row_type> rows_;
   vector<col_type> cols_;
 
@@ -1113,21 +1100,21 @@ public:
 
 //---------------------------------------------------------------------------
   //default constructor
-  SparseMatrix() : nullVal()//, nullValC()
+  SparseMatrix() : nullVal()
   {
     clear();
   };
 
 //---------------------------------------------------------------------------
   //copy constructor
-  SparseMatrix(const SparseMatrix<T>& sm2) : nullVal()//, nullValC()
+  SparseMatrix(const SparseMatrix<T>& sm2) : nullVal()
   {
     copy(sm2);
   };
 
 //---------------------------------------------------------------------------
   //creates SparseMatrix of mxn dimension
-  SparseMatrix(unsigned int m, unsigned int n) : nullVal()//, nullValC()
+  SparseMatrix(unsigned int m, unsigned int n) : nullVal()
   {
     //fill row-map
     rows_.clear();
@@ -1138,7 +1125,6 @@ public:
       rows_.push_back(temprow);
     }
 
-    //fill column-map
     cols_.clear();
     for(unsigned int i=0; i<n; ++i)
     {
@@ -1149,7 +1135,6 @@ public:
   };
 
 //---------------------------------------------------------------------------
-  //clear the entire content
   void clear()
   {
     for(rows_iterator itr=rows_.begin(); itr!=rows_.end(); ++itr)
@@ -1164,15 +1149,12 @@ public:
   }
 
 //---------------------------------------------------------------------------
-  //returns the number of rows
   unsigned int rows() const  { return rows_.size();};
 
 //---------------------------------------------------------------------------
-  //returns the number of columns
   unsigned int cols() const  { return cols_.size();};
 
 //---------------------------------------------------------------------------
-  //f postoje stl::copy zajebancije
   bool copy(const SparseMatrix<T>& sm2)
   {
     clear();
@@ -1187,7 +1169,6 @@ public:
 };
 
 //---------------------------------------------------------------------------
-  //opt
   SparseMatrix<T>& operator= (const SparseMatrix<T>& sm2)
   {
     if( this != &sm2 )
@@ -1197,7 +1178,6 @@ public:
   };
 
 //---------------------------------------------------------------------------
-  //opt
   friend SparseMatrix<T> trans(const SparseMatrix<T>& sm2)
   {
     unsigned int r = sm2.rows();
@@ -1210,7 +1190,6 @@ public:
   };
 
 //---------------------------------------------------------------------------
-  //nalazi broj clanova razlicitih od nule kao i "stepen gustine"
   pair<int, double> findN()
   {
    int n=0;
@@ -1227,13 +1206,12 @@ public:
   }
 
 //---------------------------------------------------------------------------
-  //opt
   friend Matrix solveUC(const SparseMatrix<T>& A, const Matrix& y)
   {
     unsigned int i, k;
     unsigned int n = A.rows();
     unsigned int c = A.cols();
-    ///* //f
+
     if (n != c)
       error("F-ja solveUC()\nA nije kvadratna matrica!");
     if (n != y.getRows())
@@ -1242,50 +1220,47 @@ public:
       error("F-ja solveUC()\nb nije vektor!");
     //*/
 
-    Matrix y2(n, 1); //promenjeni vektor y - resenje sistema L*y2 = y
+    Matrix y2(n, 1); 
     SparseMatrix<T> p = factor6(A);
     for(i=1; i<=n; i++)
       for(k=1, y2(i,1) = y(i,1); k<i; k++)
-        y2(i,1) -= p(i,k)*y2(k,1); //Dk * Lik * Yk
+        y2(i,1) -= p(i,k)*y2(k,1); 
 
-    Matrix x(n, 1); //vektor x - resenje sistema D*trans(L)*x = y2 (x se upisuje u y2)
+    Matrix x(n, 1); 
     for(i=n; i>=1; i--)
       for(k=n, x(i,1) = y2(i,1)/p(i,i); k>i; k--)
-        x(i,1) -= p(k,i)*x(k,1); //Lki * Xk
+        x(i,1) -= p(k,i)*x(k,1); 
 
     return x;
   };
 
 //---------------------------------------------------------------------------
-  //opt
-  //Pazi: moze i da se specificira tip (umesto <T> ide <double>)
   friend vector<double> solveUC2(const SparseMatrix<T>& A, const vector<double>& y)
   {
     unsigned int i, k;
     unsigned int n = A.rows();
     unsigned int c = A.cols();
-    ///* //f
+
     if (n != c)
       error("F-ja solveUC2()\nA nije kvadratna matrica!");
     if (n != y.size())
       error("F-ja solveUC()\nA i y nemaju isti broj redova!");
-    //*/
 
     typename SparseMatrix<T>::rows_const_iterator it;
     typename SparseMatrix<T>::onerow_const_iterator itr;
     typename SparseMatrix<T>::cols_const_iterator it2, itn, it0;
     typename SparseMatrix<T>::onecol_const_iterator itc, itcend, itcbeg;
 
-    vector<double> y2(n); //promenjeni vektor y - resenje sistema L*y2 = y
+    vector<double> y2(n); 
     SparseMatrix<T> p = factor6(A);
     for(it=p.rows_.begin(), i=0; it!=p.rows_.end(); ++it, ++i)
       for(itr=it->begin(), k=itr->first, y2[i] = y[i]; itr!=--it->end(); ++itr, k=itr->first)
         y2[i] -= itr->second * y2[k];
 
-    vector<double> x(n); //vektor x - resenje sistema D*trans(L)*x = y2 (x se upisuje u y2)
+    vector<double> x(n); 
     itn = --p.cols_.end();
     it0 = --p.cols_.begin();
-    //for(it2=p.cols_.rbegin(), i=n; it2!=p.cols_.rend(); --it2, --i)
+
     for(it2=itn, i=n; it2!=it0; --it2, --i)
     {
       itcend = --it2->end();
@@ -1298,34 +1273,29 @@ public:
   };
 
 //---------------------------------------------------------------------------
-  //opt
-  //Pazi: moze i da se specificira tip (umesto <T> ide <double>)
   friend vector<double> solveUC3(const SparseMatrix<T>& A, const vector<double>& y)
   {
     unsigned int i, k;
     unsigned int n = A.rows();
     unsigned int c = A.cols();
-    ///* //f
+    
     if (n != c)
       error("F-ja solveUC2()\nA nije kvadratna matrica!");
     if (n != y.size())
       error("F-ja solveUC()\nA i y nemaju isti broj redova!");
-    //*/
 
     typename SparseMatrix<T>::rows_const_iterator it;
     typename SparseMatrix<T>::onerow_const_iterator itr;
-    //typename SparseMatrix<T>::cols_const_iterator it2, itn, it0;
     typename SparseMatrix<T>::cols_const_riterator it2;
-    //typename SparseMatrix<T>::onecol_const_iterator itc, itcend, itcbeg;
     typename SparseMatrix<T>::onecol_const_riterator itc;
 
-    vector<double> y2(n); //promenjeni vektor y - resenje sistema L*y2 = y
+    vector<double> y2(n); 
     SparseMatrix<T> p = factor6(A);
     for(it=p.rows_.begin(), i=0; it!=p.rows_.end(); ++it, ++i)
       for(itr=it->begin(), k=itr->first, y2[i] = y[i]; itr!=--it->end(); ++itr, k=itr->first)
         y2[i] -= itr->second * y2[k];
 
-    vector<double> x(n); //vektor x - resenje sistema D*trans(L)*x = y2 (x se upisuje u y2)
+    vector<double> x(n); 
     for(it2=p.cols_.rbegin(), i=n-1; it2!=p.cols_.rend(); ++it2, --i)
 	  for(itc=it2->rbegin(), k=itc->first, x[i] = y2[i]/p(i+1,i+1); itc!=--it2->rend(); ++itc, k=itc->first)
         x[i] -= itc->second * x[k];
@@ -1334,8 +1304,6 @@ public:
   };
 
 //---------------------------------------------------------------------------
-  //opt
-  //Pazi: moze i da se specificira tip (umesto <T> ide <double>)
   friend SparseMatrix<double>& operator*=(SparseMatrix<double>& A, double x)
   {
     typename SparseMatrix<T>::rows_iterator it;
@@ -1349,8 +1317,6 @@ public:
   };
 
 //---------------------------------------------------------------------------
-  //opt
-  //Pazi: moze i da se specificira tip (umesto <T> ide <double>)
   friend vector<double> operator*(const SparseMatrix<double>& A, const vector<double>& x)
   {
     if(A.cols() != x.size())
@@ -1390,9 +1356,6 @@ public:
   };
 
 //---------------------------------------------------------------------------
-  //f ovo moze dodatno da se optimizije //opt
-  //f verovatno moze expresion template za npr. a(i,j)=3.89;
-  //operator() provides only read-access, at the moment
   T& operator() (unsigned int i, unsigned int j)
   {
     //if( i>rows() || j>cols() )
@@ -1400,13 +1363,9 @@ public:
 
     onerow_iterator it = rows_[i-1].find(j-1);
     return it != rows_[i-1].end() ? it->second : nullVal;
-    //onecol_iterator it = cols_[j-1].find(i-1);
-    //return it != cols_[j-1].end() ? it->second : nullVal;
   };
 
 //---------------------------------------------------------------------------
-  ///*//f //u
-  //operator() provides only read-access, at the moment
   const T operator() (unsigned int i, unsigned int j) const //would return ref to temp
   {
     if( i>rows() || j>cols() )
@@ -1414,14 +1373,10 @@ public:
 
     onerow_const_iterator it = rows_[i-1].find(j-1);
     return it != rows_[i-1].end() ? it->second : nullVal;
-    //onecol_iterator it = cols_[j-1].find(i-1);
-    //return it != cols_[j-1].end() ? it->second : nullVal;
   };
-  //*/
 
 //---------------------------------------------------------------------------
-  //push provides only write-access, at the moment
- //first (upper left) element is (1,1) not (0,0)
+  //push provides only write-access
   void push(unsigned int i, unsigned int j, const T& val)
   {
     if( i<=rows() && j<=cols() )
@@ -1440,18 +1395,12 @@ public:
       else if( val != nullVal )
         cols_[j-1].insert( make_pair(i-1,
                            rows_[i-1].insert(make_pair(j-1,val)).first->second) );
-        //rows_[i-1].insert( pair<unsigned int, T>(j-1, val) );
-        //cols_[j-1].insert( pair<unsigned int, T&>(i-1, val) );
-
-      //cout << i << "," << j << "  " << val << "  " << cols_[j-1][i-1] << endl;
     }
   };
 
 //---------------------------------------------------------------------------
-  //push provides only write-access, at the moment
   //it is to be used only when there isn't (i,j) element (100% sure)
   //and i, j are within rows(), cols()
- //first (upper left) element is (1,1) not (0,0)
   void push_fast(unsigned int i, unsigned int j, const T& val)
   {
     if(val != nullVal)
