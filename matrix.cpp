@@ -415,10 +415,10 @@ Matrix gaussj(const Matrix& aa)
               irow=j;
               icol=k;
             }
-          }//ifipiv[k]=0
+          }
           else if(ipiv[k] > 1)
             error("F-ja gaussj()\nipiv[k] > 1"); //error1
-        }//k loop
+        }
 
     ++(ipiv[icol]);
 
