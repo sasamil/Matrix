@@ -1,5 +1,5 @@
 
-Matrix Algebra. Sparse and dense matrices I'm using for years.
+Matrix Algebra. Sparse and dense matrices I've been using for years.
 
 Matrix class is for dense matrices. It is (imo) reliable and versatile. It contains a lot of useful matrix functions. And, a lot of operators, as well - the complex Matrix expressions (e.g. Matrix X = inv(trans(A)·P·A) · trans(A)·P·f ) are quite possible with this class. I frequently face problems in regards to Matrix Algebra and I use this class almost always. I find it very good for prototyping, testing, algorithms etc. This class has not been optimized for performancies. It has been designed for correctness, not for speed.
 
