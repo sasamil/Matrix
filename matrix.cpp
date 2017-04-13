@@ -90,12 +90,8 @@ Matrix Matrix::submatrix(int srow, int erow, int scol, int ecol) const
 
   Matrix m(erow-srow+1,ecol-scol+1);
   for(int r=srow-1, i=0; r<erow; r++, i++)
-  {
     for(int c=scol-1, j=0; c<ecol; c++, j++)
-    {
       m.mat[i][j]=this->mat[r][c];
-    }
-  }
 
   return m;
 }
@@ -106,12 +102,9 @@ int operator== (const Matrix& left, const Matrix& right)
     return 0;
 
   for(int i=0; i<left.rows; i++)
-  {
     for(int j=0; j<left.cols; j++)
-    {
       if(left.mat[i][j] != right.mat[i][j]) return 0;
-    }
-  }
+
   return 1;
 }
 //---------------------------------------------------------------------------
@@ -142,12 +135,9 @@ Matrix& Matrix::operator+= (const Matrix& right)
     error("operator +=\nBroj redova/kolona nije isti!");
 
   for(int i=0; i<rows; i++)
-  {
     for(int j=0; j<cols; j++)
-    {
       mat[i][j] += right.mat[i][j];
-    }
-  }
+
   return *this;
 }
 //---------------------------------------------------------------------------
@@ -157,12 +147,9 @@ Matrix& Matrix::operator-= (const Matrix& right)
     error("operator -=\nBroj redova/kolona nije isti!");
 
   for(int i=0; i<rows; i++)
-  {
     for(int j=0; j<cols; j++)
-    {
     	mat[i][j] -= right.mat[i][j];
-    }
-  }
+
   return *this;
 }
 //---------------------------------------------------------------------------
@@ -183,12 +170,9 @@ Matrix operator* (const Matrix& left, const Matrix& right)
 Matrix& Matrix::operator*= (const double& t)
 {
   for(int i=0; i<rows; i++)
-  {
     for(int j=0; j<cols; j++)
-    {
       mat[i][j] *= t;
-    }
-  }
+
   return *this;
 }
 //---------------------------------------------------------------------------
@@ -217,14 +201,12 @@ Matrix& Matrix::operator*= (const Matrix& right)
 istream& operator>> (istream& is, Matrix& m)
 {
   for(int i=0; i<m.rows; i++)
-  {
     for(int j=0; j<m.cols; j++)
     {
       if(is.eof())
         error("Matrix:: istream >> \n Ulazni podaci ne odgovaraju velicini matrice.");
       is >> m.mat[i][j];
     }
-  }
 
   is.seekg(0, ios::beg);
   return is;
@@ -239,9 +221,8 @@ ostream& operator<< (ostream& os, const Matrix& m)
   {
     os << '{';
     for(int j=0; j<m.cols; j++)
-    {
       os << m.mat[i][j] << ((j<m.cols-1) ? "    " : "}");
-    }
+
     os << ((i<m.rows-1)?"\n":"\n}\n");
   }
   return os;
@@ -251,9 +232,7 @@ Matrix E(int n)
 {
   Matrix m(n, n);
   for(int i=0; i<n; i++)
-  {
     m.mat[i][i] = 1.0;
-  }
 
   return m;
 }
@@ -289,12 +268,9 @@ Matrix trans(const Matrix& m)
 {
   Matrix mtemp(m.cols, m.rows);
   for(int i=0; i<m.rows; i++)
-  {
     for(int j=0; j<m.cols; j++)
-    {
       mtemp.mat[j][i] = m.mat[i][j];
-    }
-  }
+
   return mtemp;
 }
 
@@ -330,9 +306,8 @@ double det(const Matrix& m)
   if(m.rows == 1) return m.mat[0][0];
   double temp = 0.0;//double(0);
   for(int j=0,c=1; j<m.cols; j++,c*=-1)
-  {
     temp += (c*m.mat[0][j]*det(comp(m, 1, j+1)));
-  }
+
   return temp;
 }
 //---------------------------------------------------------------------------
@@ -343,13 +318,9 @@ double cofact(const Matrix& m, int r, int c)
     error("F-ja cofact()\nNije kvadratna matrica!");
 
   if((r+c)%2 != 0)
-  {
     return (-det(comp(m, r, c)));
-  }
   else
-  {
     return (det(comp(m, r, c)));
-  }
 }
 //---------------------------------------------------------------------------
 // adjunct matrix
@@ -360,12 +331,9 @@ Matrix adj(const Matrix& m)
 
   Matrix mtemp(m.rows, m.cols);
   for(int i=0; i<m.rows; i++)
-  {
     for(int j=0; j<m.cols; j++)
-    {
       mtemp.mat[i][j] = cofact(m, i+1, j+1);
-    }
-  }
+
   return trans(mtemp);
 }
 
@@ -476,7 +444,6 @@ Matrix lowerL(const Matrix& aa)
  Matrix l(n, n); //left lower matrix of aa
 
  for(j=1; j<=n; j++)
- {
    for(k=j; k<=n; k++)
    {
      for(i=1, sum=0.0; i<j; i++)   sum += l(j,i)*l(k,i);
@@ -486,7 +453,6 @@ Matrix lowerL(const Matrix& aa)
      else
        l(k,j) = (aa(j,k)-sum)/l(j,j);
    } 
- }
 
 
  return l;
