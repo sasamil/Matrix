@@ -87,8 +87,8 @@ public:
   Matrix submatrix(int srow, int erow, int scol, int ecol) const;
 
 protected:
-  void copy(const Matrix &);
   void allocate();
+  void copy(const Matrix &);
 
 private:
   int cols, rows;
