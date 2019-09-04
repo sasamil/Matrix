@@ -14,13 +14,15 @@
 
 using namespace std;
 //---------------------------------------------------------------------------
-inline void error(const char *str) {
+inline void error(const char *str)
+{
   cout << str << endl;
   exit(_error);
 }
 
 //---------------------------------------------------------------------------
-class Matrix {
+class Matrix
+{
 public:
   Matrix();
   Matrix(int m, int n);
@@ -28,20 +30,24 @@ public:
   ~Matrix();
 
   void release();
-  const int getRows() const {
+  const int getRows() const
+  {
     return rows;
   };
-  const int getCols() const {
+  const int getCols() const
+  {
     return cols;
   };
 
   Matrix &operator=(const Matrix &);
   friend int operator==(const Matrix &, const Matrix &);
   friend int operator!=(const Matrix &, const Matrix &);
-  const double &operator()(int i, int j) const {
+  const double &operator()(int i, int j) const
+  {
     return mat[i - 1][j - 1];
   };
-  double &operator()(int i, int j) {
+  double &operator()(int i, int j)
+  {
     return mat[i - 1][j - 1];
   };
 
@@ -87,8 +93,8 @@ public:
   Matrix submatrix(int srow, int erow, int scol, int ecol) const;
 
 protected:
-  void allocate();
   void copy(const Matrix &);
+  void allocate();
 
 private:
   int cols, rows;
