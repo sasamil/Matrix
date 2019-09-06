@@ -85,8 +85,8 @@ public:
   friend Matrix Lyb(const Matrix &, const Matrix &);
   friend Matrix Ltxy(const Matrix &, const Matrix &);
   friend pair<Matrix, Matrix> ludecomp(const Matrix &);
-  friend Matrix factor(const Matrix &A);
-  friend Matrix factor2(const Matrix &A);
+  friend Matrix factor(const Matrix &);
+  friend Matrix factor2(const Matrix &);
   friend Matrix solveUC(const Matrix &, const Matrix &);
   friend Matrix solveH(const Matrix &, const Matrix &);
   friend Matrix solveLU(const Matrix &, const Matrix &);
